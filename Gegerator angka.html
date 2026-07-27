@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Generator 4 Angka</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #00ffcc; }
+        .box { border: 1px solid #00ffcc; padding: 15px; width: 250px; border-radius: 8px; }
+        button { background: #00ffcc; color: #000; font-weight: bold; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h3>Generator 4 Angka</h3>
+    <button onclick="generate()">Acak Angka</button>
+    <div id="output"></div>
+</div>
+
+<script>
+function generate() {
+    let setAngka = new Set();
+    while (setAngka.size < 10) {
+        let rand = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        setAngka.add(rand);
+    }
+    
+    let html = "";
+    let i = 1;
+    setAngka.forEach(angka => {
+        html += `Baris ${i < 10 ? '0' + i : i} : <b>${angka}</b><br>`;
+        i++;
+    });
+    document.getElementById("output").innerHTML = html;
+}
+// Jalankan saat pertama dimuat
+generate();
+</script>
+
+</body>
+</html>
