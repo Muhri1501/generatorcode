@@ -2,39 +2,197 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Generator 4 Angka</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Angka Kombinasi (3D, 4D, 5D)</title>
     <style>
-        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #00ffcc; }
-        .box { border: 1px solid #00ffcc; padding: 15px; width: 250px; border-radius: 8px; }
-        button { background: #00ffcc; color: #000; font-weight: bold; padding: 8px 12px; border: none; cursor: pointer; border-radius: 4px; margin-bottom: 10px; }
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            padding: 20px; 
+            background: #121212; 
+            color: #00ffcc; 
+        }
+        h2 {
+            border-bottom: 2px solid #00ffcc;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .box { 
+            border: 1px solid #00ffcc; 
+            padding: 15px; 
+            width: 280px; 
+            border-radius: 8px; 
+            background: #1e1e1e;
+            box-shadow: 0 4px 10px rgba(0, 255, 204, 0.1);
+        }
+        h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #00ffcc;
+            padding-bottom: 5px;
+            font-size: 16px;
+            color: #fff;
+        }
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        button { 
+            background: #00ffcc; 
+            color: #000; 
+            font-weight: bold; 
+            padding: 8px 12px; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            flex: 1;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #00cca3;
+        }
+        .btn-copy {
+            background: #333;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+        }
+        .btn-copy:hover {
+            background: #00ffcc;
+            color: #000;
+        }
+        .btn-all {
+            background: #ffaa00;
+            color: #000;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            width: auto;
+        }
+        .btn-all:hover {
+            background: #e69900;
+        }
+        .result-line {
+            line-height: 1.6;
+        }
+        b {
+            color: #fff;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h3>Generator 4 Angka</h3>
-    <button onclick="generate()">Acak Angka</button>
-    <div id="output"></div>
+<h2>Generator Angka 3D, 4D & 5D</h2>
+
+<button class="btn-all" onclick="generateAll()">Acak Semua Kategori</button>
+
+<div class="container">
+    <!-- BOX 3 ANGKA -->
+    <div class="box">
+        <h3>Acak 3 Angka (10 Baris)</h3>
+        <div class="btn-group">
+            <button onclick="generate3D()">Acak</button>
+            <button class="btn-copy" onclick="copyToClipboard('output3D')">Copy</button>
+        </div>
+        <div id="output3D" class="result-line"></div>
+    </div>
+
+    <!-- BOX 4 ANGKA -->
+    <div class="box">
+        <h3>Acak 4 Angka (10 Baris)</h3>
+        <div class="btn-group">
+            <button onclick="generate4D()">Acak</button>
+            <button class="btn-copy" onclick="copyToClipboard('output4D')">Copy</button>
+        </div>
+        <div id="output4D" class="result-line"></div>
+    </div>
+
+    <!-- BOX 5 ANGKA -->
+    <div class="box">
+        <h3>Acak 5 Angka (10 Baris)</h3>
+        <div class="btn-group">
+            <button onclick="generate5D()">Acak</button>
+            <button class="btn-copy" onclick="copyToClipboard('output5D')">Copy</button>
+        </div>
+        <div id="output5D" class="result-line"></div>
+    </div>
 </div>
 
 <script>
-function generate() {
+// Array penyimpanan data mentah angka per kategori
+let currentResults = {
+    '3D': [],
+    '4D': [],
+    '5D': []
+};
+
+// Fungsi generator acak unik
+function generateRandomDigits(digitCount, lineCount) {
     let setAngka = new Set();
-    while (setAngka.size < 10) {
-        let rand = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    let maxRange = Math.pow(10, digitCount);
+
+    while (setAngka.size < lineCount) {
+        let rand = Math.floor(Math.random() * maxRange).toString().padStart(digitCount, '0');
         setAngka.add(rand);
     }
-    
-    let html = "";
-    let i = 1;
-    setAngka.forEach(angka => {
-        html += `Baris ${i < 10 ? '0' + i : i} : <b>${angka}</b><br>`;
-        i++;
-    });
-    document.getElementById("output").innerHTML = html;
+
+    return Array.from(setAngka);
 }
-// Jalankan saat pertama dimuat
-generate();
+
+// Render HTML ke tampilan
+function renderHTML(dataArray) {
+    let html = "";
+    dataArray.forEach((angka, index) => {
+        let numStr = (index + 1) < 10 ? '0' + (index + 1) : (index + 1);
+        html += `Baris ${numStr} : <b>${angka}</b><br>`;
+    });
+    return html;
+}
+
+// Trigger Per-Kategori
+function generate3D() {
+    currentResults['3D'] = generateRandomDigits(3, 10);
+    document.getElementById("output3D").innerHTML = renderHTML(currentResults['3D']);
+}
+
+function generate4D() {
+    currentResults['4D'] = generateRandomDigits(4, 10);
+    document.getElementById("output4D").innerHTML = renderHTML(currentResults['4D']);
+}
+
+function generate5D() {
+    currentResults['5D'] = generateRandomDigits(5, 10);
+    document.getElementById("output5D").innerHTML = renderHTML(currentResults['5D']);
+}
+
+function generateAll() {
+    generate3D();
+    generate4D();
+    generate5D();
+}
+
+// Fungsi Salin Angka ke Clipboard
+function copyToClipboard(elementId) {
+    let category = elementId.replace('output', '');
+    let textToCopy = currentResults[category].join('\n');
+    
+    if (!textToCopy) return;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert(`10 baris angka ${category} berhasil disalin!`);
+    }).catch(err => {
+        console.error('Gagal menyalin: ', err);
+    });
+}
+
+// Auto-run saat pertama kali halaman dimuat
+window.onload = function() {
+    generateAll();
+};
 </script>
 
 </body>
