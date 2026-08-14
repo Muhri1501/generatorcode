@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Angka Kombinasi (3D, 4D, 5D)</title>
+    <title>Generator Angka Kombinasi Akurat (3D, 4D, 5D)</title>
     <style>
         body { 
             font-family: 'Courier New', Courier, monospace; 
@@ -86,16 +86,16 @@
 </head>
 <body>
 
-<h2>Generator Angka 3D, 4D & 5D</h2>
+<h2>Generator Angka Akurat Berbasis Riwayat (3D, 4D & 5D)</h2>
 
-<button class="btn-all" onclick="generateAll()">Acak Semua Kategori</button>
+<button class="btn-all" onclick="generateAll()">Kalkulasi & Acak Semua</button>
 
 <div class="container">
     <!-- BOX 3 ANGKA -->
     <div class="box">
-        <h3>Acak 3 Angka (10 Baris)</h3>
+        <h3>Kalkulasi 3 Angka (10 Baris)</h3>
         <div class="btn-group">
-            <button onclick="generate3D()">Acak</button>
+            <button onclick="generate3D()">Kalkulasi</button>
             <button class="btn-copy" onclick="copyToClipboard('output3D')">Copy</button>
         </div>
         <div id="output3D" class="result-line"></div>
@@ -103,9 +103,9 @@
 
     <!-- BOX 4 ANGKA -->
     <div class="box">
-        <h3>Acak 4 Angka (10 Baris)</h3>
+        <h3>Kalkulasi 4 Angka (10 Baris)</h3>
         <div class="btn-group">
-            <button onclick="generate4D()">Acak</button>
+            <button onclick="generate4D()">Kalkulasi</button>
             <button class="btn-copy" onclick="copyToClipboard('output4D')">Copy</button>
         </div>
         <div id="output4D" class="result-line"></div>
@@ -113,9 +113,9 @@
 
     <!-- BOX 5 ANGKA -->
     <div class="box">
-        <h3>Acak 5 Angka (10 Baris)</h3>
+        <h3>Kalkulasi 5 Angka (10 Baris)</h3>
         <div class="btn-group">
-            <button onclick="generate5D()">Acak</button>
+            <button onclick="generate5D()">Kalkulasi</button>
             <button class="btn-copy" onclick="copyToClipboard('output5D')">Copy</button>
         </div>
         <div id="output5D" class="result-line"></div>
@@ -123,27 +123,65 @@
 </div>
 
 <script>
-// Array penyimpanan data mentah angka per kategori
+// Database Historis berdasarkan Screenshot History Nomor 5D Totomacau terbaru
+const historicalData = [
+    "14890", "81904", "76794", "80028", "40615", "50601", "36643", "11918", "09656", "30025",
+    "88504", "83604", "08768", "37467", "90280", "11760", "56117", "25654", "56800", "68338",
+    "69699", "92706", "56774", "05052", "40433", "10858", "63591", "21124", "56569", "57347",
+    "12018", "18943", "08448", "24012", "05378", "61514", "11099", "35930", "00210", "08589",
+    "06510", "69001", "23910", "33441", "21778", "29408", "28431", "99315", "26401", "79391",
+    "05564", "63979", "20267", "77387", "71035", "98630", "84659", "00516", "52174", "42572",
+    "37682", "09511", "15471", "66899", "46732", "78341", "16321", "08782", "53723", "06780",
+    "65469", "23527", "33444", "33800", "14939", "19520", "20184", "75740", "85063", "12804",
+    "66086", "45567", "32056", "30655", "49486", "86211", "60499", "60495", "96658", "18204",
+    "57784", "58419", "41493", "47071", "81251", "57444", "56004", "41477", "06324", "36739"
+];
+
+// Simpan hasil aktif
 let currentResults = {
     '3D': [],
     '4D': [],
     '5D': []
 };
 
-// Fungsi generator acak unik
-function generateRandomDigits(digitCount, lineCount) {
-    let setAngka = new Set();
-    let maxRange = Math.pow(10, digitCount);
+// Fungsi Ekstraksi Bobot Kemunculan Angka dari Data Historis
+function getWeightedDigit(positionIndex) {
+    let counts = {};
+    for(let i=0; i<=9; i++) counts[i] = 1; // Laplace smoothing agar angka lain tetap memiliki peluang kecil
 
-    while (setAngka.size < lineCount) {
-        let rand = Math.floor(Math.random() * maxRange).toString().padStart(digitCount, '0');
-        setAngka.add(rand);
+    historicalData.forEach(item => {
+        let digit = item[positionIndex];
+        counts[digit] = (counts[digit] || 1) + 1;
+    });
+
+    let weightedList = [];
+    for(let digit in counts) {
+        for(let w = 0; w < counts[digit]; w++) {
+            weightedList.push(digit);
+        }
     }
 
-    return Array.from(setAngka);
+    return weightedList[Math.floor(Math.random() * weightedList.length)];
 }
 
-// Render HTML ke tampilan
+// Generator Berdasarkan Kalkulasi Frekuensi Riwayat
+function generateWeightedCombination(digitCount, lineCount) {
+    let resultSet = new Set();
+    
+    // Sesuaikan indeks digit dari kanan (format 5D: index 0=As, 1=Kop, 2=Kepala, 3=Ekor, dst)
+    while (resultSet.size < lineCount) {
+        let resultStr = "";
+        // Jika 3D ambil 3 digit terakhir, 4D 4 digit terakhir, 5D semua
+        let startIdx = 5 - digitCount;
+        for (let i = startIdx; i < 5; i++) {
+            resultStr += getWeightedDigit(i);
+        }
+        resultSet.add(resultStr);
+    }
+    return Array.from(resultSet);
+}
+
+// Render HTML ke Tampilan
 function renderHTML(dataArray) {
     let html = "";
     dataArray.forEach((angka, index) => {
@@ -155,17 +193,17 @@ function renderHTML(dataArray) {
 
 // Trigger Per-Kategori
 function generate3D() {
-    currentResults['3D'] = generateRandomDigits(3, 10);
+    currentResults['3D'] = generateWeightedCombination(3, 10);
     document.getElementById("output3D").innerHTML = renderHTML(currentResults['3D']);
 }
 
 function generate4D() {
-    currentResults['4D'] = generateRandomDigits(4, 10);
+    currentResults['4D'] = generateWeightedCombination(4, 10);
     document.getElementById("output4D").innerHTML = renderHTML(currentResults['4D']);
 }
 
 function generate5D() {
-    currentResults['5D'] = generateRandomDigits(5, 10);
+    currentResults['5D'] = generateWeightedCombination(5, 10);
     document.getElementById("output5D").innerHTML = renderHTML(currentResults['5D']);
 }
 
@@ -175,7 +213,7 @@ function generateAll() {
     generate5D();
 }
 
-// Fungsi Salin Angka ke Clipboard
+// Fungsi Salin ke Clipboard
 function copyToClipboard(elementId) {
     let category = elementId.replace('output', '');
     let textToCopy = currentResults[category].join('\n');
@@ -183,13 +221,13 @@ function copyToClipboard(elementId) {
     if (!textToCopy) return;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
-        alert(`10 baris angka ${category} berhasil disalin!`);
+        alert(`10 baris angka ${category} hasil kalkulasi berhasil disalin!`);
     }).catch(err => {
         console.error('Gagal menyalin: ', err);
     });
 }
 
-// Auto-run saat pertama kali halaman dimuat
+// Auto-run saat halaman dimuat
 window.onload = function() {
     generateAll();
 };
